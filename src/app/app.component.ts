@@ -16,5 +16,9 @@ export class AppComponent implements OnInit {
       response => alert('Total Libraries Found: ' + response.total_count),
       error => alert('Error: ' + error.statusText)
     );
+    this.GitSearchService.gitUser('angular').then(
+      response => alert('Total Users Found: ' + response.total_count),
+      error => alert('Error: ' + error.statusText)
+    );
   }
 }
