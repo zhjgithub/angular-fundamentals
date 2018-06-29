@@ -15,6 +15,11 @@ const appRoutes: Routes = [
   },
   {
     path: 'search',
+    redirectTo: 'search/angular',
+    pathMatch: 'full'
+  },
+  {
+    path: 'search/:query',
     component: GitSearchComponent,
     data: {
       title: 'Git Search'
@@ -27,7 +32,12 @@ const appRoutes: Routes = [
 ];
 
 @NgModule({
-  declarations: [AppComponent, GitSearchComponent, HomePageComponent, NotFoundComponent],
+  declarations: [
+    AppComponent,
+    GitSearchComponent,
+    HomePageComponent,
+    NotFoundComponent
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
