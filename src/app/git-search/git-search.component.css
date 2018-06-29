@@ -27,3 +27,11 @@
 .description {
   font-size: 18px;
 }
+
+.odd {
+  background-color: silver;
+}
+
+.even {
+  background-color: white;
+}
