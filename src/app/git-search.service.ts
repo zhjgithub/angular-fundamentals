@@ -7,21 +7,24 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class GitSearchService {
-  cachedValues: Array<{ [query: string]: GitSearch }> = [];
+  cachedSearchValues: Array<{ [query: string]: GitSearch }> = [];
   cachedUserValues: Array<{ [query: string]: GitUser }> = [];
 
   constructor(private http: HttpClient) {}
 
   gitSearch = (query: string): Promise<GitSearch> => {
     const promise = new Promise<GitSearch>((resolve, reject) => {
-      if (this.cachedValues[query]) {
-        resolve(this.cachedValues[query]);
+      if (this.cachedSearchValues[query]) {
+        resolve(this.cachedSearchValues[query]);
       } else {
         this.http
           .get('https://api.github.com/search/repositories?q=' + query)
           .toPromise()
           .then(
-            response => resolve(response as GitSearch),
+            response => {
+              resolve(response as GitSearch);
+              this.cachedSearchValues[query] = response;
+            },
             error => reject(error)
           );
       }
