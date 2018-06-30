@@ -4,6 +4,10 @@
 <div *ngIf='searchResults;else elseBlock'>
   <div *ngIf='searchResults.total_count > 0;else noResults'>
     <h3 class="total">Total Results: {{searchResults.total_count}}</h3>
+    <div [hidden]="!(prevPage || nextPage)">
+      <button (click)="gitQueryPage(prevPage)" [disabled]="prevPage == null">Prev Page</button>
+      <button (click)="gitQueryPage(nextPage)" [disabled]="nextPage == null">Next Page</button>
+    </div>
     <ul class="list">
       <li [ngClass]="{odd:i%2===0, even:i%2===1}" class="list_item" *ngFor='let result of searchResults.items; index as i;'>
         <a [href]='result.html_url'>

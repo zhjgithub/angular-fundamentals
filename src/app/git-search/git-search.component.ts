@@ -13,6 +13,8 @@ export class GitSearchComponent implements OnInit {
   searchQuery: string;
   title: string;
   displayQuery: string;
+  prevPage: string;
+  nextPage: string;
   constructor(
     private GitSearchService: GitSearchService,
     private route: ActivatedRoute,
@@ -32,7 +34,41 @@ export class GitSearchComponent implements OnInit {
   gitSearch() {
     this.GitSearchService.gitSearch(this.searchQuery).then(
       response => {
-        this.searchResults = response;
+        this.searchResults = { ...response.body };
+        const linkHeader = response.headers.get('Link');
+        if (linkHeader) {
+          const matchPrev = linkHeader.match(
+            /<(http[s]?:\/\/.+)>;?\s*rel="prev"/i
+          );
+          this.prevPage = matchPrev ? matchPrev[1] : null;
+          const matchNext = linkHeader.match(
+            /<(http[s]?:\/\/.+)>;?\s*rel="next"/i
+          );
+          this.nextPage = matchNext ? matchNext[1] : null;
+        } else {
+          this.prevPage = null;
+          this.nextPage = null;
+        }
+      },
+      error => {
+        alert('Error: ' + error.statusText);
+      }
+    );
+  }
+
+  gitQueryPage(pageUrl: string) {
+    this.GitSearchService.gitSearchPagination(pageUrl).then(
+      response => {
+        this.searchResults = { ...response.body };
+        const linkHeader = response.headers.get('Link');
+        const matchPrev = linkHeader.match(
+          /<(http[s]?:\/\/.+)>;?\s*rel="prev"/i
+        );
+        this.prevPage = matchPrev ? matchPrev[1] : null;
+        const matchNext = linkHeader.match(
+          /<(http[s]?:\/\/.+)>;?\s*rel="next"/i
+        );
+        this.nextPage = matchNext ? matchNext[1] : null;
       },
       error => {
         alert('Error: ' + error.statusText);
@@ -41,7 +77,11 @@ export class GitSearchComponent implements OnInit {
   }
 
   sendQuery() {
+    if (this.displayQuery === this.searchQuery) {
+      this.gitSearch();
+    } else {
     this.searchResults = null;
     this.router.navigate(['/search/' + this.searchQuery]);
   }
+}
 }

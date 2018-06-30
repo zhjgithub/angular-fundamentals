@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { GitSearch } from './git-search';
 import { GitUser } from './git-user';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpResponse } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
@@ -12,25 +12,39 @@ export class GitSearchService {
 
   constructor(private http: HttpClient) {}
 
-  gitSearch = (query: string): Promise<GitSearch> => {
-    const promise = new Promise<GitSearch>((resolve, reject) => {
-      if (this.cachedSearchValues[query]) {
-        resolve(this.cachedSearchValues[query]);
-      } else {
-        this.http
-          .get('https://api.github.com/search/repositories?q=' + query)
-          .toPromise()
-          .then(
-            response => {
-              resolve(response as GitSearch);
-              this.cachedSearchValues[query] = response;
-            },
-            error => reject(error)
-          );
-      }
+  gitSearch(query: string): Promise<HttpResponse<GitSearch>> {
+    const promise = new Promise<HttpResponse<GitSearch>>((resolve, reject) => {
+      this.http
+        .get('https://api.github.com/search/repositories?q=' + query, {
+          observe: 'response'
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response as HttpResponse<GitSearch>);
+          },
+          error => reject(error)
+        );
     });
     return promise;
-  };
+  }
+
+  gitSearchPagination(pageUrl: string) {
+    const promise = new Promise<HttpResponse<GitSearch>>((resolve, reject) => {
+      this.http
+        .get(pageUrl, {
+          observe: 'response'
+        })
+        .toPromise()
+        .then(
+          response => {
+            resolve(response as HttpResponse<GitSearch>);
+          },
+          error => reject(error)
+        );
+    });
+    return promise;
+  }
 
   gitUser = (query: string): Promise<GitUser> => {
     const promise = new Promise<GitUser>((resolve, reject) => {
